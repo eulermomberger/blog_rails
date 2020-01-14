@@ -13,12 +13,11 @@ class PostsController < ApplicationController
       render json: Post.where(description: params[:description]).paginate(page: params[:page], per_page: 10).list
     elsif params[:comment]
       comment = Comment.where(text: params[:comment])
-      render json: Post.where(id: comment.select(:post_id)).paginate(page: params[:page], per_page: 10).list
+      render json: Post.where(id: comment.select(:post_id)).paginate(page: params[:page], per_page: 1).list
     elsif params[:tag]
       tag = Tag.where(name: params[:tag])
-      render json: Post.preload(tag).all.map do |a|
-
-      end
+      @post = Post.joins(:tags).where(tags: {id: tag.select(:id)}).list
+      render json: @post
     end
   end
 
@@ -49,8 +48,9 @@ class PostsController < ApplicationController
   end
 
   def link_tag
+    @post.check_tag(@tag)
     @post.tags.push(@tag)
-    render json: @post.tags.index_info, status: :ok
+    render json: @post.tags.list, status: :ok
   end
 
   def unlink_tag
@@ -63,7 +63,7 @@ class PostsController < ApplicationController
     @tags.each do |tag|
       @post.tags.push(tag)
     end
-    render json: @post.tags.index_info, status: :ok
+    render json: @post.tags.list, status: :ok
   end
 
   private
