@@ -80,7 +80,7 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :description, :tag_id, :tag_ids => [])
+    params.require(:post).permit(:title, :description, :user_id, :tag_id, :tag_ids => [])
   end
 
   def tag_params
