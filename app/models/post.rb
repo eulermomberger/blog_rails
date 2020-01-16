@@ -11,20 +11,10 @@ class Post < ApplicationRecord
       id: self.id,
       title: self.title,
       description: self.description,
+      updated_at: self.updated_at,
       user: self.user,
       comments: self.info,
       tags: self.tags.select(:id, :name),
-    }
-  end
-
-  def show
-    {
-      id: self.id,
-      title: self.title,
-      description: self.description,
-      user: self.user,
-      comments: self.info,
-      tags: self.tags.select(:id, :name)
     }
   end
 

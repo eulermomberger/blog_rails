@@ -27,7 +27,7 @@ class Comment < ApplicationRecord
   end
 
   def self.list_all
-    Comment.preload(:comments).all().map do |comment|
+    Comment.preload(:comments).where("comment_id IS NULL").map do |comment|
       comment.show
     end
   end

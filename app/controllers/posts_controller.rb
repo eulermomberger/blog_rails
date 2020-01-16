@@ -31,7 +31,7 @@ class PostsController < ApplicationController
   end
 
   def show
-    render json: @post.show
+    render json: @post.index_info
   end
 
   def update
@@ -59,6 +59,7 @@ class PostsController < ApplicationController
   end
 
   def replace_tags
+
     @post.tags.delete_all
     @tags.each do |tag|
       @post.tags.push(tag)
