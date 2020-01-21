@@ -32,6 +32,6 @@ class Comment < ApplicationRecord
     end
   end
 
-  default_scope -> {all.order('updated_at desc')}
+  #default_scope -> {all.order('updated_at desc')}
 
 end

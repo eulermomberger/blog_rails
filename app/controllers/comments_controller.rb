@@ -9,7 +9,7 @@ class CommentsController < ApplicationController
   def create
     @comment = @post.comments.new(comment_params)
     if @comment.save
-      render json: @comment.list_all, status: :created
+      render json: @comment.list, status: :created
     else
       render json: @comment.errors, status: :unprocessable_entity
     end
@@ -29,6 +29,7 @@ class CommentsController < ApplicationController
   end
 
   def destroy
+    @comment.comments.delete_all
     @comment.destroy
     head :no_content
   end
@@ -73,6 +74,6 @@ class CommentsController < ApplicationController
   end
 
   def comment_params
-    params.require(:comment).permit(:text)
+    params.require(:comment).permit(:text, :user_id)
   end
 end
