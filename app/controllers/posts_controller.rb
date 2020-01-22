@@ -42,6 +42,7 @@ class PostsController < ApplicationController
   end
 
   def destroy
+    @post.comments.delete_all
     @post.destroy
     head :no_content
   end
