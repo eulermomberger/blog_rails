@@ -1,20 +1,20 @@
 class PostsController < ApplicationController
   before_action :set_post, only: [:show, :update, :destroy, :link_tag, :unlink_tag, :replace_tags]
-  before_action :set_tags, only: [:create, :replace_tags, :link_tag, :unlink_tag]
+  before_action :set_tags, only: [:create, :update, :replace_tags, :link_tag, :unlink_tag]
 
   def index
     if params[:comment].nil? && params[:tag].nil? && params[:title].nil? && params[:description].nil?
-      render json: Post.paginate(page: params[:page], per_page: 9).list
+      render json: Post.list
     elsif params[:title]
-      render json: Post.where(title: params[:title]).paginate(page: params[:page], per_page: 9).list
+      render json: Post.where(title: params[:title]).list
     elsif params[:description]
-      render json: Post.where(description: params[:description]).paginate(page: params[:page], per_page: 9).list
+      render json: Post.where(description: params[:description]).list
     elsif params[:comment]
       comment = Comment.where(text: params[:comment])
-      render json: Post.where(id: comment.select(:post_id)).paginate(page: params[:page], per_page: 9).list
+      render json: Post.where(id: comment.select(:post_id)).list
     elsif params[:tag]
       tag = Tag.where(name: params[:tag])
-      @post = Post.joins(:tags).where(tags: {id: tag.select(:id)}).paginate(page: params[:page], per_page: 9).list
+      @post = Post.joins(:tags).where(tags: {id: tag.select(:id)}).list
       render json: @post
     end
   end
@@ -35,6 +35,7 @@ class PostsController < ApplicationController
 
   def update
     if @post.update(post_params)
+      replace_tags
       render json: @post.index_info, status: :ok
     else
       render json: @post.errors, status: :unprocessable_entity
@@ -63,7 +64,6 @@ class PostsController < ApplicationController
     @tags.each do |tag|
       @post.tags.push(tag)
     end
-    render json: @post.tags.list, status: :ok
   end
 
   private
