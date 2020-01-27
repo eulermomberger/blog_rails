@@ -46,6 +46,8 @@ class UsersController < ApplicationController
   # DELETE /users/1
   # DELETE /users/1.json
   def destroy
+    @user.posts.destroy_all;
+    @user.comments.destroy_all;
     @user.destroy
     head :no_content
   end

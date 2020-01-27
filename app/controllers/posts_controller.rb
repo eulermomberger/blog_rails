@@ -42,8 +42,17 @@ class PostsController < ApplicationController
     end
   end
 
+  def destroy_comments(comments)
+    comments.each do |c|
+      if c.comments
+        destroy_comments(c.comments);
+      end
+      c.destroy;
+    end
+  end
+
   def destroy
-    @post.comments.delete_all
+    destroy_comments(@post.comments)
     @post.destroy
     head :no_content
   end
