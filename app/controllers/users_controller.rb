@@ -43,11 +43,22 @@ class UsersController < ApplicationController
     end
   end
 
+  def destroy_comments(comments)
+    comments.each do |c|
+      if c.comments
+        destroy_comments(c.comments);
+      end
+      c.destroy;
+    end
+  end
+
   # DELETE /users/1
   # DELETE /users/1.json
   def destroy
-    @user.posts.destroy_all;
+    destroy_comments(@user.comments)
+    destroy_comments(@user.posts)
     @user.comments.destroy_all;
+    @user.posts.destroy_all;
     @user.destroy
     head :no_content
   end
