@@ -1,16 +1,18 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy]
+  before_action :authorize_request, except: :create
+  before_action :find_user, except: %i[create index]
 
   # GET /users
   # GET /users.json
   def index
-    render json: User.all
+    @users = User.all
+    render json: @users, status: :ok
   end
 
   # GET /users/1
   # GET /users/1.json
   def show
-    render json: @user
+    render json: @user, status: :ok
   end
 
   # GET /users/new
@@ -29,7 +31,7 @@ class UsersController < ApplicationController
     if @user.save
       render json: @user, status: :created
     else
-      render json: @user.errors, status: :unprocessable_entity
+      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -64,13 +66,14 @@ class UsersController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_user
-      @user = User.find(params[:id])
-    end
+  def find_user
+    @user = User.find(params[:_username])
+    rescue ActiveRecord::RecordNotFound
+      render json: { errors: 'User not found' }, status: :not_found
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def user_params
-      params.require(:user).permit(:name, :email)
-    end
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def user_params
+    params.permit(:name, :username, :email, :password, :password_confirmation)
+  end
 end

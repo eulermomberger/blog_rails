@@ -1,4 +1,5 @@
 class PostsController < ApplicationController
+  before_action :authorize_request
   before_action :set_post, only: [:show, :update, :destroy, :link_tag, :unlink_tag, :replace_tags]
   before_action :set_tags, only: [:create, :update, :replace_tags, :link_tag, :unlink_tag]
 

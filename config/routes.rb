@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
-  resources :users
+  resources :users, param: :_username
 
-  root "posts#index"
+  post '/auth/login', to: 'authentication#login'
 
   resources :posts, except: [ :new, :edit ] do
     resources :comments, except: [ :new, :edit ]

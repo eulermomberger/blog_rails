@@ -1,4 +1,5 @@
 class CommentsController < ApplicationController
+  before_action :authorize_request
   before_action :set_post
   before_action :set_comment, only: [:update, :show, :destroy, :add_comment, :remove_comment, :update_comment, :get_comments, :show_comment]
 
