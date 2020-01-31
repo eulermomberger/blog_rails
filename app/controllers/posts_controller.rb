@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_action :authorize_request
+  before_action :authorize_request, except:[:index, :show]
   before_action :set_post, only: [:show, :update, :destroy, :link_tag, :unlink_tag, :replace_tags]
   before_action :set_tags, only: [:create, :update, :replace_tags, :link_tag, :unlink_tag]
 
@@ -36,11 +36,15 @@ class PostsController < ApplicationController
   end
 
   def update
-    if @post.update(post_params)
+    if post_params[:user_id] == @current_user.id
       replace_tags
-      render json: @post.index_info, status: :ok
+      if @post.update(post_params)
+        render json: @post.index_info, status: :ok
+      else
+        render json: @post.errors, status: :unprocessable_entity
+      end
     else
-      render json: @post.errors, status: :unprocessable_entity
+      render json: { error: 'unauthorized' }, status: :unauthorized
     end
   end
 
@@ -54,10 +58,14 @@ class PostsController < ApplicationController
   end
 
   def destroy
-    destroy_comments(@post.comments)
-    @post.user.decrement(:number_of_posts, 1).save
-    @post.destroy
-    head :no_content
+    if @post.user == @current_user
+      destroy_comments(@post.comments)
+      @post.user.decrement(:number_of_posts, 1).save
+      @post.destroy
+      head :no_content
+    else
+      render json: { error: 'unauthorized' }, status: :unauthorized
+    end
   end
 
   def link_tag

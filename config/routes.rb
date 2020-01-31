@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :users, param: :_username
+  resources :users, param: :_username, except: [ :new, :edit]
 
   post '/auth/login', to: 'authentication#login'
 

@@ -1,5 +1,5 @@
 class CommentsController < ApplicationController
-  before_action :authorize_request
+  before_action :authorize_request, except: [:index, :show]
   before_action :set_post
   before_action :set_comment, only: [:update, :show, :destroy, :add_comment, :remove_comment, :update_comment, :get_comments, :show_comment]
 
@@ -22,17 +22,25 @@ class CommentsController < ApplicationController
   end
 
   def update
-    if @comment.update(comment_params)
-      render json: @post.comments, status: :ok
+    if comment_params[:user_id] == @current_user.id
+      if @comment.update(comment_params)
+        render json: @post.comments, status: :ok
+      else
+        render json: @comment.errors, status: :unprocessable_entity
+      end
     else
-      render json: @comment.errors, status: :unprocessable_entity
+      render json: { error: 'unauthorized' }, status: :unauthorized
     end
   end
 
   def destroy
-    @comment.comments.delete_all
-    @comment.destroy
-    head :no_content
+    if @comment.user == @current_user
+      @comment.comments.delete_all
+      @comment.destroy
+      head :no_content
+    else
+      render json: { error: 'unauthorized' }, status: :unauthorized
+    end
   end
 
   def add_comment
