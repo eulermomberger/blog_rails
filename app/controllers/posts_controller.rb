@@ -22,6 +22,7 @@ class PostsController < ApplicationController
 
   def create
     @post = Post.new(post_params)
+    @post.user.increment(:number_of_posts, 1).save
     if @post.save
       link_tag
       render json: @post, status: :created
@@ -54,6 +55,7 @@ class PostsController < ApplicationController
 
   def destroy
     destroy_comments(@post.comments)
+    @post.user.decrement(:number_of_posts, 1).save
     @post.destroy
     head :no_content
   end
